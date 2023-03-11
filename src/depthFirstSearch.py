@@ -44,46 +44,36 @@ def mazeSolver(fileName):
 
     startTime = time.time()
     # Stores the path taken through the maze via a recursive DFS algorithm
-    mazePath = recursiveDFS(mazeDictionary, startPoint, goalPoint, [])
-    endTime = time.time()
-    count = 0
-    mazePathSet = set()
-    pathString = ""
-    while mazePath[count] != goalPoint:
-        pathString += str(mazePath[count]) + " -> "
-        mazePathSet.add(mazePath[count])
-        
-        if count%13 == 0 and count > 0:
-            pathString += "\n"
+    # mazePathRecursiveDFS = recursiveDFS(mazeDictionary, startPoint, goalPoint, [])
+    # endTime = time.time()
+    # count = 0
+    # mazePathSet = set()
+    # pathString = ""
+    # while mazePathRecursiveDFS[count] != goalPoint:
+    #     mazePathSet.add(mazePathRecursiveDFS[count])
+    #     pathString += str(mazePathRecursiveDFS[count]) + " -> "
 
-        count += 1
+    #     if count%10 == 0 and count > 0:
+    #         pathString += "\n"
 
-    pathString += str(goalPoint)
-    mazePathSet.add(goalPoint)
-    print(goalPoint)
+    #     count += 1
 
-    # The number of steps in the resulting path is the length of the returned path
-    print("The number of steps in the path taken:             ", count + 1)
+    # pathString += str(goalPoint)
+    # mazePathSet.add(goalPoint)
+    #performanceStatistics(count+1, len(mazePathSet), round(endTime - startTime, 5), pathString)
 
-    # The number of nodes explored is the same as the length of the returned path
-    print("The number of nodes explored by the algorithm was: ", len(mazePathSet))
-
-    # Outputs the time taken by the algorithm to solve the maze
-    print("The time taken to solve the maze was:              ", round(endTime - startTime, 5), " seconds")
-
-    # The total number of steps taken by the algorithm
-
-
-
-    # The path taken by the algorithm
-    print("The full path taken by the algorithm is: \n" + pathString)
+    # Stores the path taken through the maze via an iterative DFS algorithm
+    startTime2 = time.time()
+    mazePathIterativeDFS = iterativeDFS(mazeDictionary, startPoint, goalPoint)
+    endTime2 = time.time()
+    # print(mazePathIterativeDFS)
+    print("Time taken: ", round(endTime2 - startTime2, 5))
 
 
 def recursiveDFS(mazeDictionary, startPoint, goalPoint, pathTaken):
-    """ Executes the depth first search algorithm on a provided maze and
-    returns the path taken by the algorithm.
+    """ Executes a recursive depth first search on the provided maze and
+    returns the path taken by the algorithm from the start to the goal node.
     """
-    global totalSteps
     # Breaks the starting point down into a (x,y) coordinate
     (currentRow, currentColumn) = startPoint
     # If the node currently being looked at is the final one, return the path
@@ -110,15 +100,73 @@ def recursiveDFS(mazeDictionary, startPoint, goalPoint, pathTaken):
             # Other wise move on to the next node
             if (row,column) not in pathTaken:
                 pathTaken.append(startPoint)
-                print((row,column))
-                print(pathTaken)
-                time.sleep(5)
                 # Adds the node to the path of visited nodes
                 recursiveDFS(mazeDictionary, (row,column), goalPoint, pathTaken)
             
     # If the current node is a dead end, back track up the maze until another 
     # node can be explored
     return pathTaken
+
+
+def iterativeDFS(mazeDictionary, startPoint, goalPoint):
+    """ Executes an iterative depth first search on the provided maze and
+    returns the path taken by the algorithm from the start to the goal node.
+    """
+    # Tracks the path taken by the algorithm as a list
+    pathTaken = []
+    # Stores the nodes that have already been visited by the algorithm
+    visitedNodes = set()
+    # Stores the parent of each node as a dictionary
+    parentDict = {}
+    # Initialises the stack to be used by the algorithm and places the start node in it
+    dfsStack = [startPoint]
+
+    # While there are still nodes to explore, search through the maze
+    while (len(dfsStack) > 0):
+        # Get the current node to look at (at the top of the stack)
+        (currentRow, currentColumn) = dfsStack.pop()
+
+        # If the goal node has been reached add it to the path taken
+        if (currentRow, currentColumn)  == goalPoint:
+            pathTaken.append(goalPoint)
+
+            # Backtracks to the start to get the path taken
+            while (currentRow, currentColumn) != startPoint:
+                pathTaken.append(parentDict[(currentRow, currentColumn)])
+                (currentRow, currentColumn) = parentDict[(currentRow, currentColumn)]
+            
+            # Returns the path taken (Reversed as moving from goal to start)
+            return list(reversed(pathTaken))
+
+        # Adds the neighbouring nodes to the stack and continues the search
+        nextNodes = [
+            (currentRow, currentColumn - 1),
+            (currentRow + 1, currentColumn),
+            (currentRow, currentColumn + 1),
+            (currentRow - 1, currentColumn)
+        ]
+        
+        for (row, column) in nextNodes:
+            # Only explores the next node if it is a path
+            if row >= 0 and column >= 0 and mazeDictionary[(row,column)] == '-':
+                if (row,column) not in visitedNodes:
+                    visitedNodes.add((row,column))
+                    dfsStack.append((row,column))
+                    parentDict[(row,column)] = (currentRow, currentColumn)
+
+    # If the current node being looked at is the goal node, return the stack
+    return pathTaken
+
+
+def performanceStatistics(numSteps, numNodes, timeTaken, fullPath):
+    """ Outputs the performance statistics for a given algorithm, including
+    the number of steps the algorithm takes, the number of nodes it explores
+    The time it takes to execute and the full path from start to finish.
+    """
+    print("The number of steps in the path taken:             ", numSteps)
+    print("The number of nodes explored by the algorithm was: ", numNodes)
+    print("The time taken to solve the maze was:              ", timeTaken, " seconds")
+    print("The full path taken by the algorithm is:         \n" + fullPath)
 
 
 if __name__ == '__main__':
