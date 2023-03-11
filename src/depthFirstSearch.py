@@ -1,4 +1,6 @@
-"""Solves a maze using the depth first search algorithm"""
+"""Solves a maze using the depth first search algorithm 
+(recursively and iteratively)
+"""
 import time
 
 
