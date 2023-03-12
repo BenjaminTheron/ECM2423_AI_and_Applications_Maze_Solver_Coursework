@@ -1,12 +1,14 @@
 """Solves a maze using the A* search algorithm"""
 import time
 from priorityQueue import MazePriorityQueue
+from depthFirstSearch import performanceStatistics
+
 
 def mazeSolver(fileName):
-    """ Uses the depth first search algorithm to solve a maze and prints out
-    statistics about the algorithms performance solving the maze, incl the
-    number of nodes explored, the execution time and the number of steps in
-    the path. ADD MORE METRICS.
+    """ Uses the A* search algorithm to solve a maze and prints out
+    statistics about the algorithm's performance when solving the maze,
+    including the number of nodes explored, the execution time and the
+    number of steps in the path. ADD MORE METRICS.
     """
     # Track the column and row number of a given position
     row = 0
@@ -33,42 +35,39 @@ def mazeSolver(fileName):
         for position in line:
             # Only storing values if they are a path or a wall
             if position == '#' or position == '-':
-                mazeDictionary[(row,column)] = position
+                mazeDictionary[(row, column)] = position
                 column += 1
 
         # Moves down to the start of the next row
         column = 0
         row += 1
-    
+
     filePointer.close()
 
+    # Stores both the path taken and the number of nodes explored by the
+    # algorithm
     startTime = time.time()
-    # Stores the path taken through the maze via a recursive DFS algorithm
-    # mazePathRecursiveDFS = recursiveDFS(mazeDictionary, startPoint, goalPoint, [])
-    # endTime = time.time()
-    # count = 0
-    # mazePathSet = set()
-    # pathString = ""
-    # while mazePathRecursiveDFS[count] != goalPoint:
-    #     mazePathSet.add(mazePathRecursiveDFS[count])
-    #     pathString += str(mazePathRecursiveDFS[count]) + " -> "
+    (mazePathAStar, nodesExpanded) = aStarSearch(mazeDictionary,
+                                                 startPoint, goalPoint)
+    endTime = time.time()
+    mazePathString = ''
 
-    #     if count%10 == 0 and count > 0:
-    #         pathString += "\n"
+    # Converts the path list into a string with arrows between each point
+    # Allows the path to be printed in a more readable format
+    for item in mazePathAStar:
+        if item == goalPoint:
+            mazePathString += str(goalPoint)
+        else:
+            mazePathString += str(item) + " -> "
 
-    #     count += 1
-
-    # pathString += str(goalPoint)
-    # mazePathSet.add(goalPoint)
-    #performanceStatistics(count+1, len(mazePathSet), round(endTime - startTime, 5), pathString)
-
-    # Stores the path taken through the maze via an iterative DFS algorithm
-    startTime2 = time.time()
-    (mazePathAStar, nodesExpanded) = aStarSearch(mazeDictionary, startPoint, goalPoint)
-    endTime2 = time.time()
-    # print(mazePathIterativeDFS)
-    print(mazePathAStar)
-    print("Time taken: ", round(endTime2 - startTime2, 5))
+    # Prints out all the algorithm's performance statistics
+    # Finds the difference between the time at the start and end of the search
+    # and rounds it to five decimal places
+    performanceStatistics(len(mazePathAStar),
+                          nodesExpanded,
+                          round(endTime - startTime, 5),
+                          mazePathString
+                          )
 
 
 def aStarSearch(mazeDictionary, startPoint, goalPoint):
@@ -77,29 +76,43 @@ def aStarSearch(mazeDictionary, startPoint, goalPoint):
     nodes that have been expanded by the algorithm.
     """
     nodesExpanded = 0
+    # Initialises a new priority queue for the maze and places the starting
+    # node in it
     frontier = MazePriorityQueue()
-    frontier.insert((startPoint, heuristicCalculator(startPoint, goalPoint) + 1))
+    frontier.insert((startPoint,
+                     heuristicCalculator(startPoint, goalPoint) + 1))
+    # Using a set to store the visited nodes reduces the time complexity by
+    # O(n) when compared to a list
     visitedNodes = set()
     visitedNodes.add(startPoint)
+    # Tracks the path taken by the algorithm as a list
     pathTaken = []
+    # Stores the parent of each node in a dictionary
     parentDict = {}
 
-    while frontier.isEmpty() == False:
-        ((currentRow, currentColumn), currentCostFunction) = frontier.queuePop()
+    # While there are still paths to explore, move through the maze
+    while frontier.isEmpty() is False:
+        # Breaks the current node into a coordinate and cost function
+        ((currentRow, currentColumn),
+         currentCostFunction) = frontier.queuePop()
         nodesExpanded += 1
 
+        # If the goal node has been reached, add it to the path taken
         if (currentRow, currentColumn) == goalPoint:
             pathTaken.append(goalPoint)
             # Backtracks to the start to get the path taken
             while (currentRow, currentColumn) != startPoint:
                 pathTaken.append(parentDict[(currentRow, currentColumn)])
-                (currentRow, currentColumn) = parentDict[(currentRow, currentColumn)]
-            
+                (currentRow, currentColumn) = parentDict[(currentRow,
+                                                          currentColumn)]
+
             # Returns the path taken (Reversed as moving from goal to start)
             return (list(reversed(pathTaken)), nodesExpanded)
-        
-        visitedNodes.add((currentRow,currentColumn))
 
+        # Adds the current node to the set of visited nodes
+        visitedNodes.add((currentRow, currentColumn))
+
+        # Calculates each potential neighbouring node
         nextNodes = [
             (currentRow, currentColumn - 1),
             (currentRow + 1, currentColumn),
@@ -108,45 +121,57 @@ def aStarSearch(mazeDictionary, startPoint, goalPoint):
         ]
 
         for (row, column) in nextNodes:
-            # Only explores the next node if it is a path
-            if row >= 0 and column >= 0 and mazeDictionary[(row,column)] == '-':
+            # Only explores the next node if it is a valid path
+            if row >= 0 and column >= 0 and mazeDictionary[(row,
+                                                            column)] == '-':
 
-                if (row,column) not in visitedNodes and frontier.inQueue((row, column)) == False:
-                    frontier.insert(((row,column), heuristicCalculator((row,column), goalPoint) + 1))
-                    parentDict[(row,column)] = (currentRow, currentColumn)
+                # The neighbouring node is only visited if it isn't in the
+                # frontier and hasn't been visited
+                if (row, column) not in visitedNodes and frontier.inQueue(
+                        (row, column)) is False:
+                    # Adds the neighbouring node along with its cost function
+                    # to the frontier
+                    frontier.insert(((row, column),
+                                    heuristicCalculator((row, column),
+                                                        goalPoint) + 1))
+                    # Stores the parent of the neighbouring node as the
+                    # current node
+                    parentDict[(row, column)] = (currentRow, currentColumn)
 
-                elif (row,column) not in visitedNodes and frontier.inQueue((currentRow, currentColumn)) == True:
-                    frontier.changeNodeCost(((row, column), heuristicCalculator((row,column), goalPoint) + 1))
+                # If the neighbnouring node is already in the frontier (and
+                # hasn't been visited) change the value of the cost function
+                # if it is lower than what is already stored in the frontier
+                elif (row, column) not in visitedNodes and frontier.inQueue(
+                        (currentRow, currentColumn)) is True:
+                    frontier.changeNodeCost(((row, column),
+                                            heuristicCalculator((row, column),
+                                                                goalPoint)
+                                            + 1))
 
+    # If the whole maze is explored and the goal node isn't found
+    # return an empty path
     return (None, nodesExpanded)
 
 
 def heuristicCalculator(currentPosition, goalPoint):
     """ Calculates a heuristic value for the node provided, this is the
     Manhattan distance between the current position and the goal node.
-    Other heuristics (Euclidiean and diagonal) are calculated for further
+    Other heuristics (Euclidean and diagonal) are calculated for further
     experimentation.
     """
+    # Breaks the goal node and the current node into a (row,column) tuple
     (currentRow, currentColumn) = currentPosition
     (goalRow, goalColumn) = goalPoint
 
+    # Finds the Manhattan distance between the current node and the goal node
     dx = abs(goalRow - currentRow)
-    dy = abs(goalColumn - goalColumn)
+    dy = abs(goalColumn - currentColumn)
 
+    # Returns the sum multiplied by an arbitrary weight (10)
     return (10 * (dx + dy))
 
 
-def performanceStatistics(numSteps, numNodes, timeTaken, fullPath):
-    """ Outputs the performance statistics for a given algorithm, including
-    the number of steps the algorithm takes, the number of nodes it explores
-    The time it takes to execute and the full path from start to finish.
-    """
-    print("The number of steps in the path taken:             ", numSteps)
-    print("The number of nodes explored by the algorithm was: ", numNodes)
-    print("The time taken to solve the maze was:              ", timeTaken, " seconds")
-    print("The full path taken by the algorithm is:         \n" + fullPath)
-
-
 if __name__ == '__main__':
-    mazeFileName = str(input("Enter the filename of the maze you would like solved: "))
+    mazeFileName = str(input(
+                    "Enter the filename of the maze you would like solved: "))
     mazeSolver("../docs/mazes/" + mazeFileName)
