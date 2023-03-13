@@ -1,7 +1,6 @@
-"""Solves a maze using the depth first search algorithm
-(recursively and iteratively)
-"""
+""" Solves a maze using an iterative depth first search algorithm """
 import time
+from recursiveDepthFirstSearch import performanceStatistics
 
 
 def mazeSolver(fileName):
@@ -44,19 +43,13 @@ def mazeSolver(fileName):
 
     filePointer.close()
 
-    # Stores the path taken through the maze via a recursive DFS algorithm
-    startTime = time.time()
-    mazePathRecursiveDFS = recursiveDFS(mazeDictionary,
-                                        startPoint, goalPoint, [])
-    endTime = time.time()
-
     # Stores the path taken through the maze via an iterative DFS algorithm
-    startTime2 = time.time()
+    startTime = time.time()
     (mazePathIterativeDFS, nodesExpanded) = iterativeDFS(mazeDictionary,
                                                          startPoint,
                                                          goalPoint
                                                          )
-    endTime2 = time.time()
+    endTime = time.time()
 
     # Converts the path taken into a more readable string, with arrows between
     # the points
@@ -72,48 +65,9 @@ def mazeSolver(fileName):
     # and rounds it to five decimal places
     performanceStatistics(len(mazePathIterativeDFS),
                           nodesExpanded,
-                          round(endTime2 - startTime2, 5),
+                          round(endTime - startTime, 5),
                           mazePathString
                           )
-
-
-def recursiveDFS(mazeDictionary, startPoint, goalPoint, pathTaken):
-    """ Executes a recursive depth first search on the provided maze and
-    returns the path taken by the algorithm from the start to the goal node.
-    """
-    # Breaks the starting point down into a (x,y) coordinate
-    (currentRow, currentColumn) = startPoint
-    # If the node currently being looked at is the final one, return the path
-    # taken through the maze
-    if startPoint == goalPoint:
-        pathTaken.append(startPoint)
-        return pathTaken
-
-    # Stores the list of possible next nodes in a list
-    # At most four ways you can go from the current node (left, down, right or
-    # up). ASSUMES each maze has a wall, so bounds checking only needs to be
-    # done when looking at the first node
-    nextNodes = [
-        (currentRow, currentColumn - 1),
-        (currentRow + 1, currentColumn),
-        (currentRow, currentColumn + 1),
-        (currentRow - 1, currentColumn)
-    ]
-
-    for (row, column) in nextNodes:
-        # Only explore the next node if it is a path
-        if row >= 0 and column >= 0 and mazeDictionary[(row, column)] == '-':
-            # If the next node hasn't been visited yet, continue as normal,
-            # Otherwise move on to the next node
-            if (row, column) not in pathTaken:
-                pathTaken.append(startPoint)
-                # Adds the node to the path of visited nodes
-                recursiveDFS(mazeDictionary,
-                             (row, column), goalPoint, pathTaken)
-
-    # If the current node is a dead end, back track up the maze until another
-    # node can be explored
-    return pathTaken
 
 
 def iterativeDFS(mazeDictionary, startPoint, goalPoint):
@@ -168,18 +122,6 @@ def iterativeDFS(mazeDictionary, startPoint, goalPoint):
 
     # If the current node being looked at is the goal node, return the stack
     return pathTaken
-
-
-def performanceStatistics(numSteps, numNodes, timeTaken, fullPath):
-    """ Outputs the performance statistics for a given algorithm, including
-    the number of steps the algorithm takes, the number of nodes it explores
-    The time it takes to execute and the full path from start to finish.
-    """
-    print("The full path taken by the algorithm is:         \n" + fullPath)
-    print("The number of steps in the path taken:             ", numSteps)
-    print("The number of nodes explored by the algorithm was: ", numNodes)
-    print("The time taken to solve the maze was:              ", timeTaken,
-          " seconds")
 
 
 if __name__ == '__main__':

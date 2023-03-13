@@ -1,7 +1,7 @@
 """Solves a maze using the A* search algorithm"""
 import time
 from priorityQueue import MazePriorityQueue
-from depthFirstSearch import performanceStatistics
+from recursiveDepthFirstSearch import performanceStatistics
 
 
 def mazeSolver(fileName):
