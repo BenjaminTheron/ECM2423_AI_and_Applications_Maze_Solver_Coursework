@@ -1,5 +1,6 @@
 """ Solves a maze using a recursive depth first search algorithm """
 import time
+from iterativeDepthFirstSearch import performanceStatistics, mazeOutputToFile
 
 
 def mazeSolver(fileName):
@@ -71,6 +72,8 @@ def mazeSolver(fileName):
                           mazePathString
                           )
 
+    mazeOutputToFile(mazeDictionary, fileName, mazePathRecursiveDFS)
+
 
 def recursiveDFS(mazeDictionary, startPoint, goalPoint, pathTaken):
     """ Executes a recursive depth first search on the provided maze and
@@ -109,18 +112,6 @@ def recursiveDFS(mazeDictionary, startPoint, goalPoint, pathTaken):
     # If the current node is a dead end, back track up the maze until another
     # node can be explored
     return pathTaken
-
-
-def performanceStatistics(numSteps, numNodes, timeTaken, fullPath):
-    """ Outputs the performance statistics for a given algorithm, including
-    the number of steps the algorithm takes, the number of nodes it explores
-    The time it takes to execute and the full path from start to finish.
-    """
-    print("The full path taken by the algorithm is:         \n" + fullPath)
-    print("The number of steps in the path taken:             ", numSteps)
-    print("The number of nodes explored by the algorithm was: ", numNodes)
-    print("The time taken to solve the maze was:              ", timeTaken,
-          " seconds")
 
 
 if __name__ == '__main__':

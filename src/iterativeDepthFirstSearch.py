@@ -1,13 +1,12 @@
 """ Solves a maze using an iterative depth first search algorithm """
 import time
-from recursiveDepthFirstSearch import performanceStatistics
 
 
 def mazeSolver(fileName):
     """ Uses the depth first search algorithm to solve a maze and prints out
     statistics about the algorithms performance solving the maze, incl the
     number of nodes explored, the execution time and the number of steps in
-    the path. ADD MORE METRICS.
+    the path.
     """
     # Track the column and row number of a given position
     row = 0
@@ -68,6 +67,8 @@ def mazeSolver(fileName):
                           round(endTime - startTime, 5),
                           mazePathString
                           )
+    
+    mazeOutputToFile(mazeDictionary, fileName, mazePathIterativeDFS)
 
 
 def iterativeDFS(mazeDictionary, startPoint, goalPoint):
@@ -104,11 +105,13 @@ def iterativeDFS(mazeDictionary, startPoint, goalPoint):
             return (list(reversed(pathTaken)), nodesExpanded)
 
         # Calculates each potential neighbouring node
+        # As a stack is being used, the nodes need to be added in the reverse
+        # order to which they are to be searched
         nextNodes = [
-            (currentRow, currentColumn - 1),
-            (currentRow + 1, currentColumn),
-            (currentRow, currentColumn + 1),
-            (currentRow - 1, currentColumn)
+            (currentRow - 1, currentColumn), # Up
+            (currentRow, currentColumn + 1), # Right
+            (currentRow + 1, currentColumn), # Down
+            (currentRow, currentColumn - 1)  # Left
         ]
 
         for (row, column) in nextNodes:
@@ -118,10 +121,47 @@ def iterativeDFS(mazeDictionary, startPoint, goalPoint):
                 if (row, column) not in visitedNodes:
                     visitedNodes.add((row, column))
                     dfsStack.append((row, column))
+                    # print("(Row, Column) expanded:", str(row) + " " + str(column), "stack: ", dfsStack)
+                    # print()
                     parentDict[(row, column)] = (currentRow, currentColumn)
 
     # If the current node being looked at is the goal node, return the stack
     return pathTaken
+
+
+def performanceStatistics(numSteps, numNodes, timeTaken, fullPath):
+    """ Outputs the performance statistics for a given algorithm, including
+    the number of steps the algorithm takes, the number of nodes it explores
+    The time it takes to execute and the full path from start to finish.
+    """
+    print("The full path taken by the algorithm is:         \n" + fullPath)
+    print("The number of steps in the path taken:             ", numSteps)
+    print("The number of nodes explored by the algorithm was: ", numNodes)
+    print("The time taken to solve the maze was:              ", timeTaken,
+          " seconds")
+
+
+def mazeOutputToFile(mazeDictionary, fileName, pathTaken):
+    """
+    """
+    filePointer = open("mazePath.txt", 'w')
+    mazeFile = open(fileName, 'r')
+    mazeString = mazeFile.readlines()
+    mazeFile.close()
+    numColumns = int(len(mazeString[0])/2) - 1
+    mazeStringWithPath = ""
+
+    for (row, column) in pathTaken:
+        mazeDictionary[(row,column)] = "X"
+    
+    for (row, column) in mazeDictionary:
+        mazeStringWithPath += " " + mazeDictionary[(row, column)]
+
+        if column == numColumns:
+            mazeStringWithPath += "\n"
+    
+    filePointer.writelines(mazeStringWithPath)
+    filePointer.close()
 
 
 if __name__ == '__main__':

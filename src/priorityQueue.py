@@ -2,47 +2,49 @@
 import math
 
 class MazePriorityQueue():
-    """"""
+    """
+    """
     def __init__(self):
-        self.priorityQ = []
+        self.priorityQ = {}
+
 
     def changeNodeCost(self, data):
         "Finds and returns the index of a (row,column) coordinate in the priority queue"
-        ((currentRow, currentColumn), newCost) = data
-        for item in self.priorityQ:
-            ((row,column),cost) = item
+        ((currentRow, currentColumn), newCostFunction) = data
+        if self.priorityQ[(currentRow, currentColumn)] < newCostFunction:
+            self.priorityQ[(currentRow, currentColumn)] = newCostFunction
 
-            if (row, column) == (currentRow, currentColumn) and newCost < cost:
-                self.priorityQ[self.priorityQ.index((row,column),cost)] = ((row,column), newCost)
-    
-    def setIndex(self, index, data):
-        self.priorityQ[index] = data
 
     def insert(self, data):
-        self.priorityQ.append(data)
+        ((row, column), cost) = data
+        self.priorityQ[row,column] = cost
+
 
     def inQueue(self, data):
-        if data in self.priorityQ:
+        (row, column) = data
+        
+        if (row, column) in self.priorityQ:
             return True
         else:
             return False
+
 
     def isEmpty(self):
         if len(self.priorityQ) == 0:
             return True
         else:
             return False
-    
-    def queuePop(self):
-        lowestValue = 0
 
-        # Remove the item with the lowest heuristic (distance to goal node)
-        for i in range(len(self.priorityQ)):
-            ((row, column), currentHeuristic) = self.priorityQ[i]
-            (coordinates, lowestHeuristic) = self.priorityQ[lowestValue]
-            if currentHeuristic < lowestHeuristic:
-                lowestValue = i
-        
-        nextNode = self.priorityQ[lowestValue]
-        del self.priorityQ[lowestValue]
+
+    def queuePop(self):
+        lowestItem = next(iter(self.priorityQ))
+        lowestCost = self.priorityQ[lowestItem]
+
+        for item in self.priorityQ:
+            if self.priorityQ[item] <= lowestCost:
+                lowestItem = item
+                lowestCost = self.priorityQ[item]
+
+        nextNode = (lowestItem, self.priorityQ[lowestItem])
+        del self.priorityQ[lowestItem]
         return nextNode
