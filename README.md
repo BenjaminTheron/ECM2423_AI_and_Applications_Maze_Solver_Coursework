@@ -1,2 +1,1 @@
-# ECM2423_AI_Coursework
-
+# ECM2423_AI_and_Applications_Maze_Solver_Coursework
