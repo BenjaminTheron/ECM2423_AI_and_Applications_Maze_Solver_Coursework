@@ -19,7 +19,7 @@ of the project you can do the following:
   - Execute the iterative DFS algorithm on a maze: Execute the command'python3 iterative_depth_first_search.py', then enter
     the exact filename of one of the four aforementioned mazes and press enter.
 
-After execution, each algorithm will output the path taken, some performance metrics about the algorith. Additionally,
+After execution, each algorithm will output the path taken, some performance metrics about the algorithm. Additionally,
 by inspecting the file, maze\textunderscore path.txt, you can see a graphical representation of the path the algorithm
 took through the maze (pressing ctrl-f or command-f and filtering by X will highlight the path and make it easier to see).
 
