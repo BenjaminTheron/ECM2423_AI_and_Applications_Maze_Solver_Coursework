@@ -1,13 +1,16 @@
 """ Solves a maze using a recursive depth first search algorithm """
 import time
-from iterativeDepthFirstSearch import performanceStatistics, mazeOutputToFile
+from iterative_depth_first_search import performanceStatistics, mazeOutputToFile
 
 
-def mazeSolver(fileName):
+def mazeSolver(fileName : str):
     """ Uses the depth first search algorithm to solve a maze and prints out
     statistics about the algorithms performance solving the maze, incl the
     number of nodes explored, the execution time and the number of steps in
-    the path. ADD MORE METRICS.
+    the path.
+
+    Args:
+        fileName (str):
     """
     # Track the column and row number of a given position
     row = 0
@@ -75,9 +78,24 @@ def mazeSolver(fileName):
     mazeOutputToFile(mazeDictionary, fileName, mazePathRecursiveDFS)
 
 
-def recursiveDFS(mazeDictionary, startPoint, goalPoint, pathTaken):
+def recursiveDFS(mazeDictionary : dict,
+                 startPoint : tuple[int, int],
+                 goalPoint : tuple[int, int],
+                 pathTaken : list[(int, int)]) -> tuple[int, int]:
     """ Executes a recursive depth first search on the provided maze and
     returns the path taken by the algorithm from the start to the goal node.
+
+    Args:
+        mazeDictionary (dict of (int, int): str):
+
+        startPoint (int, int):
+
+        goalPoint (int, int):
+
+        pathTaken ([(int, int]): 
+
+    Returns:
+        tuple[int, int]: pathTaken.
     """
     # Breaks the starting point down into a (x,y) coordinate
     (currentRow, currentColumn) = startPoint
