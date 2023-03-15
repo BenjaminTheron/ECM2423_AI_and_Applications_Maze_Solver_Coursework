@@ -20,7 +20,7 @@ of the project you can do the following:
     the exact filename of one of the four aforementioned mazes and press enter.
 
 After execution, each algorithm will output the path taken, some performance metrics about the algorithm. Additionally,
-by inspecting the file, maze\textunderscore path.txt, you can see a graphical representation of the path the algorithm
+by inspecting the file, maze_path.txt, you can see a graphical representation of the path the algorithm
 took through the maze (pressing ctrl-f or command-f and filtering by X will highlight the path and make it easier to see).
 
 To add new mazes place to execute the algorithm on, place them into the docs folder in the project directory and follow the exact
